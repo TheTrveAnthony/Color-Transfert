@@ -8,7 +8,7 @@ from matrix import r_l, l_r, l_a, a_l
 
 
 
-def transert():
+def color_transfert():
 
 	""" "Main" function that regroups everything """
 
@@ -46,7 +46,8 @@ def transert():
 									# your followers believe that you are a skilled photograph.	
 									# I personally don't use this shit so fuck it.
 
-	print("{} saved.".format(nom))
+	print("{} saved.".format(name))
+
 
 def rgb2alpha(img):
 
@@ -56,7 +57,7 @@ def rgb2alpha(img):
 	### First of all we need the size of our picture to make the transforms
 
 	x = len(img) ; y = len(img[0])
-	alpha = np.full((x, y, 3), 0)		## This will be the transformed image
+	alpha = np.full((x, y, 3), 0, dtype = float)		## This will be the transformed image
 
 	### Now we gotta access each pixel of the picture
 
@@ -81,15 +82,72 @@ def rgb2alpha(img):
 	return alpha
 
 
-
-
-
-
 def alpha2rgb(img):
 
-	""" Same as rgb2alpha but in the opposite way. """
+	### First of all we need the size of our picture to make the transforms
+
+	x = len(img) ; y = len(img[0])
+	rgb = np.full((x, y, 3), 0, dtype = float)		## This will be the transformed image
+
+	### Now we gotta access each pixel of the picture
+
+	for i, vi in enumerate(img):
+		for j, px in enumerate(vi):
+			### There we are
+
+			# Step 1 : LMS transform, for that we use l_r
+
+			rgb[i][j] = np.matmul(a_l, px)
+
+			# Step 2 : power em all (power 10)
+
+			rgb[i][j][0] = pow(10, rgb[i][j][0])
+			rgb[i][j][1] = pow(10, rgb[i][j][1])
+			rgb[i][j][2] = pow(10, rgb[i][j][2])
+
+			# Step 3 : rgb, by using l_r
+
+			rgb[i][j] = np.matmul(l_r, rgb[i][j])
+
+	return rgb
+
 
 def make_up(trg, src):
 
 	""" We apply the src colors to target here, in the l alpha beta colorspace,
 		using mean and standart deviation."""
+
+	######### First step is to compute the means standart deviation of 
+	######### each channel of the images. Reminder : we are in the l alpha beta space here
+
+	## We gotta reshape em First
+
+	rs_trg = np.reshape(trg, (len(trg)*len(trg[0]), 3))
+	rs_src = np.reshape(src, (len(src)*len(src[0]), 3))
+
+	## mean 
+
+	m_trg = np.mean(rs_trg, axis = 0, dtype = np.float64)		## This returns a array of three values which are
+	m_src = np.mean(rs_src, axis = 0, dtype = np.float64)		## the means of each channel
+
+	## Standart deviation
+
+	sd_trg = np.std(rs_trg, axis = 0, dtype = np.float64)		## Same with standart deviation
+	sd_src = np.std(rs_src, axis = 0, dtype = np.float64)		## We use 64bits floats for more accuracy
+
+
+	######## Now we've got all we need, next step is to perform the make
+	######## up operations on each pixel
+
+	x = len(trg) ; y = len(trg[0])
+	mu_trg = np.full((x, y, 3), 0, dtype = float)		## This will be the transformed target mu = make up
+
+	for i, vi in enumerate(trg):
+		for j, px in enumerate(vi):
+			for k, val in enumerate(px):
+
+				mu_trg[i][j][k] = (sd_src[k]/sd_trg[k])*(val - m_trg[k]) + m_src[k]
+
+	return mu_trg
+
+

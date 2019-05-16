@@ -1,5 +1,5 @@
-from functions import transfert
+from functions import color_transfert as ct
 
 
-transfert()			# Yeah, I like short main files.
+ct()			# Yeah, I like short main files.
 					# We could also directly run it from the python interpreter

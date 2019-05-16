@@ -3,6 +3,8 @@
 Here are the matrixes we gonna need to make the different transforms to 
 go from a color space to another one
 
+If we multiply r_l*l_r and a_l*l_a, we get I3 which is coherent, it is commutative as well
+
 """
 
 import numpy as np 
@@ -50,7 +52,7 @@ l_a = np.matmul(abc, m)
 
 # again, some scalar values 
 
-x = 3/s(3) ; y = 6/s(6) ; z = 2/s(2)
+x = s(3)/3 ; y = s(6)/6 ; z = s(2)/2
 
 ## Then the matrixes for the transform
 
