@@ -43,8 +43,8 @@ def color_transfert():
 	name += ".png"
 
 	cv.imwrite(name, m_target)		# You can now post your new picture to instagramm and let
-									# your followers believe that you are a skilled photograph.	
-									# I personally don't use this shit so fuck it.
+						# your followers believe that you are a skilled photograph.	
+						# I personally don't use this shit so fuck it.
 
 	print("{} saved.".format(name))
 
